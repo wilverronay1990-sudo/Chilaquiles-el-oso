@@ -7,12 +7,20 @@ import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import fs from 'fs';
 
 dotenv.config();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = Number(process.env.PORT || 3000);
-const db = new Database(path.join(__dirname, 'data', 'oso.db'));
+
+const dataDir = process.env.DATA_DIR || path.join(__dirname, 'data');
+const uploadsDir = process.env.UPLOADS_DIR || path.join(__dirname, 'uploads');
+
+fs.mkdirSync(dataDir, { recursive: true });
+fs.mkdirSync(uploadsDir, { recursive: true });
+
+const db = new Database(path.join(dataDir, 'oso.db'));
 db.pragma('journal_mode = WAL');
 
 db.exec(`
